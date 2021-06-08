@@ -49,9 +49,12 @@ public final class App implements Runnable {
 
   @Override
   public void run() {
-    System.out.println("AWS MFA credentials updater");
+    confirmOkToEditCredentials();
+    updateCredentials();
+  }
+
+  private void updateCredentials() {
     try {
-      confirmOkToEditCredentials();
       credentialsUpdater.update(credentialsSupplier.get(region, mfa, sessionDurationSeconds), linkedProfileName, roleArn, mfaSectionName, region);
     } catch (SdkException ex) {
       throw new IllegalStateException(ex.getMessage());
