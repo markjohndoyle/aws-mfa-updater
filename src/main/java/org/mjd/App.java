@@ -13,10 +13,9 @@ import software.amazon.awssdk.core.exception.SdkException;
 @CommandLine.Command
 public final class App implements Runnable {
 
-
   private final Function<String, Boolean> confirmationFunction;
 
-  private final CredentialsIniUpdater credentialsUpdater;
+  private final AwsCredentialsUpdater credentialsUpdater;
 
   private final AwsCredentialsSupplier credentialsSupplier;
 
@@ -41,7 +40,7 @@ public final class App implements Runnable {
   @Option(names = {"-lp", "--linkedProfile"}, description = "The name of the linked profile section to create in the credentials file.", defaultValue = "secured")
   String linkedProfileName;
 
-  public App(Function<String, Boolean> confirmationFunction, CredentialsIniUpdater credentialsUpdater, AwsCredentialsSupplier credentialsSupplier) {
+  public App(Function<String, Boolean> confirmationFunction, AwsCredentialsUpdater credentialsUpdater, AwsCredentialsSupplier credentialsSupplier) {
     this.confirmationFunction = confirmationFunction;
     this.credentialsUpdater = credentialsUpdater;
     this.credentialsSupplier = credentialsSupplier;
@@ -55,8 +54,7 @@ public final class App implements Runnable {
       confirmOkToEditCredentials();
       credentialsUpdater.update(credentialsSupplier.get(region, mfa, sessionDurationSeconds), linkedProfileName, roleArn, mfaSectionName, region);
     } catch (SdkException ex) {
-      System.err.println(ex.getMessage());
-      System.exit(-1);
+      throw new IllegalStateException(ex.getMessage());
     }
   }
 
@@ -64,8 +62,7 @@ public final class App implements Runnable {
     if (!quiet) {
       if(!confirmationFunction.apply(Ansi.AUTO
           .string("@|bold,red,blink ⚠ This will update your credentials files. Do you wish to continue? What have got to lose? [Y/n] |@"))) {
-        System.out.println("¯\\_(ツ)_/¯");
-        System.exit(0);
+        throw new IllegalStateException("¯\\_(ツ)_/¯ --- Not allowed to edit the credentials!");
       }
     }
   }
