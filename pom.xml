@@ -6,7 +6,7 @@
 
   <groupId>org.mjd</groupId>
   <artifactId>aws-mfa-updater</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2-SNAPSHOT</version>
 
   <properties>
     <compiler-plugin.version>3.8.1</compiler-plugin.version>
